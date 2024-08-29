@@ -1,0 +1,12 @@
+services:
+  piston:
+    image: ghcr.io/engineer-man/piston/api:latest
+    container_name: piston
+    ports:
+      - 4000:4000
+    networks:
+      - piston-network
+
+networks:
+  piston-network:
+    name: piston-network

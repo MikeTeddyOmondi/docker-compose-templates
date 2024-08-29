@@ -1,0 +1,57 @@
+version: "3.7"
+services:
+    traefik:
+        image: traefik:v2.2
+        container_name: traefik-v2
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        ports:
+            - 80:80
+        command:
+            - "--api"
+            - "--providers.docker=true"
+            - "--providers.docker.exposedByDefault=false"
+            - "--entrypoints.web.address=:80"
+        networks:
+            - proxy
+
+    authentik:
+        container_name: authentik
+        image: ghcr.io/goauthentik/proxy
+        ports:
+            - 8900:9000
+            - 8443:9443
+        environment:
+            AUTHENTIK_HOST: http://localhost
+            AUTHENTIK_INSECURE: "false"
+            AUTHENTIK_TOKEN: token-generated-by-authentik
+            # Starting with 2021.9, you can optionally set this too
+            # when authentik_host for internal communication doesn't match the public URL
+            # AUTHENTIK_HOST_BROWSER: https://external-domain.tld
+        labels:
+            traefik.enable: true
+            traefik.port: 8900
+            traefik.http.routers.authentik.rule: Host(`app.localhost`) && PathPrefix(`/oidc.auth.localhost/`)
+            # `authentik-proxy` refers to the service name in the compose file.
+            traefik.http.middlewares.authentik.forwardauth.address: http://authentik:8900/oidc.auth.localhost/auth/traefik
+            traefik.http.middlewares.authentik.forwardauth.trustForwardHeader: true
+            traefik.http.middlewares.authentik.forwardauth.authResponseHeaders: X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid,X-authentik-jwt,X-authentik-meta-jwks,X-authentik-meta-outpost,X-authentik-meta-provider,X-authentik-meta-app,X-authentik-meta-version
+        restart: unless-stopped
+        networks:
+            - proxy  
+
+    whoami:
+        image: containous/whoami
+        container_name: whoami  
+        labels:
+            traefik.enable: true
+            traefik.http.routers.whoami.rule: Host(`app.localhost`)
+            traefik.http.routers.whoami.middlewares: authentik@docker
+        restart: unless-stopped
+        networks:
+            - proxy
+
+networks:
+    proxy:
+        name: proxy
+        external: true      

@@ -1,0 +1,59 @@
+version: "3.6"
+
+services:
+  m01:
+    image: mongo:4.2
+    container_name: mo1
+    restart: unless-stopped
+    ports:
+      - "27016:27017"
+    command: "mongod --config /etc/mongod.conf"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: password
+    networks:
+      - mongo-local-cluster
+    volumes:
+      - mongodb-data-m01:/data/db
+      - ./config/m01.conf:/etc/mongod.conf
+      - ./localcluster-keyfile:/localcluster-keyfile  
+
+  m02:
+    image: mongo:4.2
+    container_name: mo2
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    command: "mongod --config /etc/mongod.conf"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb-data-m02:/data/db
+      - ./config/m02.conf:/etc/mongod.conf
+      - ./localcluster-keyfile:/localcluster-keyfile
+
+  m03:
+    image: mongo:4.2
+    container_name: mo3
+    restart: unless-stopped
+    ports:
+      - "27019:27017"
+    command: "mongod --config /etc/mongod.conf"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb-data-m03:/data/db
+      - ./config/m03.conf:/etc/mongod.conf
+      - ./localcluster-keyfile:/localcluster-keyfile
+  
+volumes:
+  mongodb-data-m01:
+  mongodb-data-m02:
+  mongodb-data-m03:
+
+networks:
+  mongo-local-cluster:
+    name: mongo-local-cluster
+    external: false

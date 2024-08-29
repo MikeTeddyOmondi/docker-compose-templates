@@ -1,0 +1,37 @@
+version: '3.6'
+services:
+  db:
+    image: postgres:15.5
+    container_name: postgres  
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5432:5432
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    networks:
+      - postgres    
+
+  pgadmin:
+    container_name: pgadmin4
+    image: dpage/pgadmin4:8.5
+    environment:
+      PGADMIN_DEFAULT_EMAIL: mike_omondi@outlook.com
+      PGADMIN_DEFAULT_PASSWORD: password
+      # PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+       - pgadmin:/var/lib/pgadmin
+    ports:
+      - 5555:80
+    networks:
+      - postgres
+    restart: unless-stopped
+
+networks:
+  postgres:
+    name: postgres
+    driver: bridge
+
+volumes:
+  pgadmin:

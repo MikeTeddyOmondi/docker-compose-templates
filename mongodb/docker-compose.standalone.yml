@@ -1,0 +1,25 @@
+version: '3.6'
+
+services:
+
+  mongodb:
+    image: mongo:4.2
+    container_name: mongodb  
+    restart: unless-stopped
+    ports:
+      - "27017:27017"  
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - mongodb_network    
+
+volumes:
+  mongodb_data:
+
+networks:
+  mongodb_network:
+    name: mongodb_network
+      

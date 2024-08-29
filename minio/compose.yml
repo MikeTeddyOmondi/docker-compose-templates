@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  cdn-proxy:
+    image: traefik:v2.10
+    container_name: cdn-proxy
+    command: --api.insecure=true --providers.docker
+    restart: always
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - cdn-network
+
+  minio:
+    container_name: s3-bucket
+    image: minio/minio
+    restart: always
+    environment:
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minio_password
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - ./uploads:/data    
+    networks:    
+      - cdn-network
+    command: server /data --console-address ":9001"    
+    labels:
+      - "traefik.http.routers.cdn.rule=Host(`cdn.localhost`)"
+      - "traefik.http.services.cdn.loadbalancer.server.port=9000"
+    depends_on:
+      - cdn-proxy
+ 
+networks:
+  cdn-network:
+    name: cdn
+    driver: bridge
+    external: true

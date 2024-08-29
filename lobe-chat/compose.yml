@@ -1,0 +1,16 @@
+services:
+  lobe-chat:
+    container_name: lobe-chat      
+    image: lobehub/lobe-chat:v0.160.1
+    ports:
+      - 3210:3210
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ACCESS_CODE=lobe66
+    networks:
+      - proxy-net
+
+networks:
+  proxy-net:
+    external: true
+  

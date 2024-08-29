@@ -1,0 +1,11 @@
+services:
+  singlestore:
+    image: 'singlestore/cluster-in-a-box'
+    container_name: singlestore
+    ports:
+      - 3306:3306
+      - 8080:8080
+    environment:
+      LICENSE_KEY: ${SINGLESTORE_LICENSE}
+      ROOT_PASSWORD: ${SINGLESTORE_ROOT_PASSWORD}
+      START_AFTER_INIT: 'Y'

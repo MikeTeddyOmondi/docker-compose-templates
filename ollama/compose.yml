@@ -1,0 +1,21 @@
+networks:
+  proxy-net:
+    external: true
+
+volumes:
+  ollama:
+  # open-webui:
+
+services:
+  ollama:
+    container_name: "ollama"
+    image: "ollama/ollama:latest"
+    networks:
+      - proxy-net
+    expose:
+      - 11434
+    environment:
+      - OLLAMA_ORIGINS="*"    
+    volumes:
+      - ollama:/root/.ollama
+    restart: unless-stopped
