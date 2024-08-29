@@ -1,0 +1,19 @@
+services:
+  pocketbase:
+    container_name: pocketbase
+    image: ranckosolutionsinc/pocketbase:0.22.11
+    build: . 
+    volumes:
+      - pocketbase-volume:/app/data
+    ports:
+      - "8090:8090"
+    networks:
+      - proxy-net    
+
+volumes:
+  pocketbase-volume:
+    name: pocketbase-volume
+
+networks:
+  proxy-net:
+    external: true

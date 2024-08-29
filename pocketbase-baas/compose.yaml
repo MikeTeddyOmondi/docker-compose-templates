@@ -1,0 +1,13 @@
+services:
+  pocketbase:
+    container_name: pocketbase
+    build: .
+    image: pocketbase:latest
+    volumes:
+      - pocketbase-volume:/app/data
+    ports:
+      - "8090:8090"
+
+volumes:
+  pocketbase-volume:
+    name: pocketbase-volume
