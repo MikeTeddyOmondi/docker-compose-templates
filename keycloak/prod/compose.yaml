@@ -1,0 +1,87 @@
+services:
+
+  # postgres:
+  #   image: postgres:16.0
+  #   container_name: postgres
+  #   restart: always
+  #   # ports:
+  #   #   - "5432:5432"
+  #   volumes:
+  #     - keycloak-db-data:/var/lib/postgresql/data
+  #   networks:
+  #     - keycloak-network
+  #   environment:
+  #     POSTGRES_USER: $POSTGRES_USER
+  #     POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+  #     POSTGRES_DB: $POSTGRES_DB
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.4
+    container_name: keycloak-prod
+    restart: always
+    # ports:
+    #   - "8686:8080"
+    #   - "8443:8443"
+    # depends_on:
+    #   - postgres
+    command:
+      - start
+    networks:
+      - keycloak-network
+    environment:
+      KC_DB: keycloak
+      KC_DB_URL_HOST: 172.17.0.1
+      KC_DB_URL_DATABASE: postgresql://postgres:password@172.17.0.1/keycloak
+      KC_DB_USERNAME: $POSTGRES_USER
+      KC_DB_PASSWORD: $POSTGRES_PASSWORD
+      KC_HOSTNAME_URL: $KC_HOSTNAME_URL
+      # KC_HOSTNAME_STRICT_HTTPS: "true"
+      # KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
+      KC_PROXY: edge
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: $KEYCLOAK_ADMIN_PASSWORD
+      KEYCLOAK_FRONTEND_URL: $KEYCLOAK_FRONTEND_URL
+      # SMTP Configuration
+      # KC_MAIL_SMTP_SERVER: $SMTP_SERVER
+      # KC_MAIL_SMTP_PORT: $SMTP_PORT
+      # KC_MAIL_SMTP_FROM: $SMTP_FROM
+      # KC_MAIL_SMTP_USER: $SMTP_USER
+      # KC_MAIL_SMTP_PASSWORD: $SMTP_PASSWORD
+      # KC_MAIL_SMTP_AUTH: true
+      # KC_MAIL_SMTP_SSL: true
+    labels:
+    - "traefik.http.routers.keycloak-prod.rule=Host(`keycloak.rancko.labs`)"
+    - "traefik.http.services.keycloak-prod.loadbalancer.server.port=8080"
+
+  traefik:
+    image: traefik:2.11
+    container_name: traefik
+    command: --api.insecure=true --providers.docker
+    restart: always
+    ports:
+      - "8686:80"
+      # - "8080:8080"
+    environment:
+      - KEYCLOAK_HOSTNAME=$KEYCLOAK_HOSTNAME
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - "traefik.enable=false"  
+    depends_on:
+      - keycloak
+    networks:
+      - keycloak-network
+      - proxy-net
+
+networks:
+  keycloak-network:
+    driver: bridge
+  
+  proxy-net:
+    name: proxy-net
+    driver: bridge
+    external: true
+
+volumes:
+  keycloak-db-data:
+    driver: local

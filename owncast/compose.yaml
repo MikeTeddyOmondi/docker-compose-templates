@@ -1,0 +1,9 @@
+services:
+
+  owncast:
+    image: owncast/owncast:latest
+    ports:
+      - "8989:8080"
+      - "1935:1935"
+    volumes:
+      - ./data:/app/data

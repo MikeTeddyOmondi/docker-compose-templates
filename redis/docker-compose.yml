@@ -1,13 +1,13 @@
-version: '3.8'
 services:
   cache:
-    image: redis:7.2
+    image: redis:7.2.4-alpine
     container_name: redis
     restart: always
     ports:
       - 6379:6379
     command: redis-server --save 20 1 --loglevel warning # --requirepass ${REDIS_PASSWORD}  
-    environment:
-      REDIS_ARGS: "--requirepass password --user user on >password ~* allcommands --user default off nopass nocommands"
+    # environment:
+    #   REDIS_ARGS: "--requirepass password --user user on >password ~* allcommands --user default off nopass nocommands"
     volumes: 
       - ./data:/data
+
