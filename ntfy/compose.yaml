@@ -1,0 +1,26 @@
+services:
+  ntfy:
+    image: binwiederhier/ntfy # Specifies the ntfy Docker image.
+    container_name: ntfy # Names the container for easier management.
+    command:
+      - serve # Runs the ntfy server.
+    environment:
+      - TZ=UTC # Optional: Sets the timezone. Change as needed.
+    user: 1000:1000 # Optional: Replace with your user/group or UID/GID.
+    volumes:
+      - ./var/cache/ntfy:/var/cache/ntfy # Persists cache data.
+      - ./etc/ntfy:/etc/ntfy # Stores ntfy configuration files.
+    ports:
+      - 8899:80 # Exposes ntfy on port 80.
+    healthcheck: # Optional: Health check to ensure ntfy is running properly.
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q --tries=1 http://localhost:80/v1/health -O - | grep -Eo '\"healthy\"\\s*:\\s*true' || exit 1",
+        ]
+      interval: 60s # Runs the health check every 60 seconds.
+      timeout: 10s # Timeout for the health check is 10 seconds.
+      retries: 3 # If the health check fails, retries 3 times.
+      start_period: 40s # Waits 40 seconds before starting the first check.
+    restart: unless-stopped # Ensures ntfy restarts unless manually stopped.
+
