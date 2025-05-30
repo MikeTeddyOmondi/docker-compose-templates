@@ -15,8 +15,8 @@ services:
     container_name: sticky-notes-app
     image: ranckosolutionsinc/sticky-notes-app:v2.0.0
     restart: unless-stopped
-    ports:
-      - 127.0.0.1:8000:3000 
+    # ports:
+    #   - 127.0.0.1:8000:3000 
 
   tinyauth:
     container_name: tinyauth
