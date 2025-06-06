@@ -12,9 +12,9 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
-      #- "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
-      #- "--certificatesresolvers.letsencrypt.acme.email=your@email.com"
-      #- "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=your@email.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"
       - "443:443"
@@ -28,4 +28,5 @@ services:
 networks:
   proxy-network:
     name: proxy-network
+    external: true
 
