@@ -1,0 +1,18 @@
+name: nats
+
+services:
+    nats:
+        container_name: nats
+        networks:
+            - nats
+        restart: unless-stopped
+        ports:
+            - 4222:4222
+            - 8222:8222
+        image: nats:2.11.4
+        command: --jetstream --http_port 8222 -sd /data/jetstream
+networks:
+    nats:
+        external: true
+        name: nats
+
