@@ -1,0 +1,10 @@
+name: qstash-dev
+
+services:
+    qstash:
+        container_name: qstash
+        ports:
+            - 8080:8080
+        image: public.ecr.aws/upstash/qstash:latest
+        command: qstash dev
+          

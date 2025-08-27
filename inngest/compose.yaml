@@ -1,0 +1,20 @@
+services:
+  inngest:
+    image: inngest/inngest:latest
+    container_name: inngest  
+    command: "inngest start"
+    ports:
+      - "8288:8288"
+      - "8289:8289"
+    networks:
+      - inngest    
+    environment:
+      INNGEST_EVENT_KEY: inngest_event_key
+      INNGEST_SIGNING_KEY: inngest_signing_key
+      # INNGEST_LOG_LEVEL: error # <-- this line here
+
+
+networks:
+  inngest:
+    name: inngest
+      

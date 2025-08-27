@@ -3,7 +3,7 @@ name: proxy
 services:
 
   traefik:
-    image: traefik:v2.10
+    image: traefik:v2.11
     container_name: proxy  
     restart: unless-stopped
     command:
@@ -12,16 +12,16 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
-      - "--certificatesresolvers.letsencrypt.acme.email=your@email.com"
-      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      # - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      # - "--certificatesresolvers.letsencrypt.acme.email=your@email.com"
+      # - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
     ports:
-      - "80:80"
-      - "443:443"
+      - "7979:80"
+      - "7443:443"
       - "8881:8080"  
     labels:
       - traefik.enable=true
-      - traefik.http.routers.traefik_https.rule=Host(cloud.miketeddyomondi.dev)
+      - traefik.http.routers.traefik_https.rule=Host(lab.locci.cloud)
       - traefik.http.routers.traefik_https.entrypoints=https
       - traefik.http.routers.traefik_https.tls=true
       - traefik.http.routers.traefik_https.service=api@internal  
