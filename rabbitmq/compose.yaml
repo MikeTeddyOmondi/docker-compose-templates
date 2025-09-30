@@ -1,0 +1,25 @@
+name: rabbitmq
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: password
+    networks:
+      - rabbitmq  
+    ports:
+      - "5672:5672"   # AMQP (used by apps)
+      - "15672:15672" # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  rabbitmq_data:
+    name: rabbitmq
+
+networks:
+  rabbitmq:
+    driver: bridge
+
