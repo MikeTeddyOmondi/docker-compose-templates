@@ -1,0 +1,34 @@
+🔑 Generating Ed25519 keypair for libSQL authentication...
+
+✅ Keys generated successfully!
+
+📋 COPY THESE VALUES:
+
+Public Key (for SQLD_AUTH_JWT_KEY_FILE):
+Jq9ll4lxPsOeaouIKh5byfbku3qYO2LtlqNtx7lKyA4
+
+JWT Auth Token (for client connections):
+eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NTgyMDQ3OTV9.keRCLUj48NpkHrX5wwCpx6Mo7hQwPZMjCFxr3U6rnOCVwX5iQlDYm8t-MqYoe0PH3Tg9ZqeMW-1izc5Fz9daAw
+
+================================================================================
+🐳 DOCKER COMMAND:
+Save the public key to a file and run:
+echo "Jq9ll4lxPsOeaouIKh5byfbku3qYO2LtlqNtx7lKyA4" > sqld_public_key.txt
+docker run -p 8080:8080 -d \
+  -v $(pwd)/sqld_public_key.txt:/etc/sqld_public_key.txt \
+  -e SQLD_AUTH_JWT_KEY_FILE=/etc/sqld_public_key.txt \
+  ghcr.io/tursodatabase/libsql-server:latest
+
+================================================================================
+🧪 TEST CONNECTION:
+Use this code to test your connection:
+
+import { createClient } from "npm:@libsql/client";
+
+const client = createClient({
+  url: "http://YOUR_SERVER_IP:8080",
+  authToken: "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NTgyMDQ3OTV9.keRCLUj48NpkHrX5wwCpx6Mo7hQwPZMjCFxr3U6rnOCVwX5iQlDYm8t-MqYoe0PH3Tg9ZqeMW-1izc5Fz9daAw"
+});
+
+const result = await client.execute("SELECT 1 as test;");
+console.log(result);

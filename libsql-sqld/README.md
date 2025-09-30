@@ -12,3 +12,9 @@ docker container run \
   libsql/sqld:latest
 
 ```
+
+## Generate public/private keys
+
+```bash
+deno run -A gen-keys.ts
+```
