@@ -1,0 +1,20 @@
+services:
+  lxconsole:
+    container_name: lxconsole
+    image: 'penninglabs/lxconsole:v0.6.2'
+    restart: unless-stopped
+    ports:
+      - '5400:5000'
+    networks:
+        - lxconsole
+    volumes:
+      - ./lxcbackups:/opt/lxconsole/backups
+      - ./certs:/opt/lxconsole/certs
+      - ./server:/opt/lxconsole/instance
+
+networks:
+  lxconsole:
+    name: lxconsole
+
+
+
