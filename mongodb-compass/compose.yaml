@@ -1,0 +1,14 @@
+name: compass-web
+
+services:
+  compass-web:
+    container_name: compass
+    ports:
+      - 8765:8080
+    environment:
+      - CW_MONGO_URI=mongodb://mongo:password@172.17.0.1:27017/?authSource=admin
+      - CW_ENABLE_SHELL=true
+      - CW_ENABLE_EDIT_CONNECTIONS=true
+      - CW_BASIC_AUTH_USERNAME=admin
+      - CW_BASIC_AUTH_PASSWORD=password
+    image: haohanyang/compass-web:0.4.1
