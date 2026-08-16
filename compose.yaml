@@ -1,0 +1,10 @@
+name: pgadmin4
+services:
+  pgadmin4:
+    container_name: pgadmin4
+    image: dpage/pgadmin4:9.17
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=mike_omondi@outlook.com
+      - PGADMIN_DEFAULT_PASSWORD=password
+      - PGADMIN_LISTEN_PORT=5555
+    network_mode: host
