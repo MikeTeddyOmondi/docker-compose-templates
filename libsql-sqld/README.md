@@ -8,7 +8,7 @@ docker container run \
   -d \
   --name sqld \
   -v sqld-data:/var/lib/sqld \
-  -p 127.0.0.1:8080:8080 \
+  -p 127.0.0.1:8210:8080 \
   libsql/sqld:latest
 
 ```

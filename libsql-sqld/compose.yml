@@ -2,18 +2,18 @@ version: "3.8"
 
 services:
   libsql:
-    image: libsql/sqld:latest
+    image: ghcr.io/tursodatabase/libsql-server:latest
     container_name: libsql
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "8210:8080"
     networks:
       - libsql  
     volumes:
-      - libsql-data:/var/lib/sqld
-
-volumes:
-  libsql-data:
+      - ./sqld_data:/var/lib/sqld
+      - ./sqld_public_key.txt:/etc/sqld_public_key.txt
+    environment:
+      - SQLD_AUTH_JWT_KEY_FILE=/etc/sqld_public_key.txt
 
 networks:
   libsql:
