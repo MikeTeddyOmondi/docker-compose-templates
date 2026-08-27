@@ -1,0 +1,79 @@
+{
+  "$schema": "https://www.krakend.io/schema/v2.7/krakend.json",
+  "version": 3,
+  "name": "ursula-gateway",
+  "port": 8080,
+  "timeout": "0s",
+  "endpoints": [
+    {
+      "endpoint": "/{bucket}",
+      "method": "PUT",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "host": [
+            "http://ursula:4437"
+          ],
+          "url_pattern": "/{bucket}",
+          "encoding": "no-op"
+        }
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "ES256",
+          "jwk_url": "http://host.docker.internal:8787/.well-known/jwks.json",
+          "cache": true,
+          "disable_jwk_security": true
+        }
+      }
+    },
+    {
+      "endpoint": "/{bucket}/{stream}",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "host": [
+            "http://ursula:4437"
+          ],
+          "url_pattern": "/{bucket}/{stream}",
+          "encoding": "no-op"
+        }
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "ES256",
+          "jwk_url": "http://host.docker.internal:8787/.well-known/jwks.json",
+          "cache": true,
+          "disable_jwk_security": true
+        }
+      }
+    },
+    {
+      "endpoint": "/{bucket}/{stream}",
+      "method": "GET",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "host": [
+            "http://ursula:4437"
+          ],
+          "url_pattern": "/{bucket}/{stream}",
+          "encoding": "no-op"
+        }
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "ES256",
+          "jwk_url": "http://host.docker.internal:8787/.well-known/jwks.json",
+          "cache": true,
+          "disable_jwk_security": true
+        }
+      },
+      "input_query_strings": [
+        "offset",
+        "live"
+      ]
+    }
+  ]
+}

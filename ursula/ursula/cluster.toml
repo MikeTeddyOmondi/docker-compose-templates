@@ -1,0 +1,46 @@
+# Three-voter cluster. Used by every node; `--node-id` is what differs.
+#
+# Read this before starting: a cluster is not a drop-in upgrade from the single
+# node. Its data does not migrate, and the first boot is a one-time ceremony.
+
+[server]
+listen = "0.0.0.0:4437"
+
+[raft]
+node_id = 1          # overridden per container by --node-id
+group_count = 16
+
+# FIRST BOOT ONLY. Leave true to form the group, then set it to false and
+# restart — otherwise a later restart can try to re-initialise membership.
+init_membership_per_group = true
+
+# One entry per voter, including this node. Names resolve on the compose
+# network, so they work unchanged across hosts only if you keep the names.
+[[raft.peers]]
+node_id = 1
+address = "ursula:4437"
+
+[[raft.peers]]
+node_id = 2
+address = "ursula-2:4437"
+
+[[raft.peers]]
+node_id = 3
+address = "ursula-3:4437"
+
+[raft.wal]
+backend = "disk"
+path = "/var/lib/ursula"
+
+# ── Cold tier: REQUIRED here ─────────────────────────────────────────────────
+# Not optional for a cluster. A replica must be able to read chunks flushed by
+# whichever node held leadership, and without shared storage it cannot. Fill
+# this in before starting more than one voter.
+#
+# [storage.cold]
+# backend = "s3"
+# root = "ursula-locci-20260824"
+# [storage.cold.s3]
+# bucket = "ursula-locci"
+# region = "auto"
+# endpoint = "https://<accountid>.r2.cloudflarestorage.com"

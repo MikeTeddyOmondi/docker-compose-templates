@@ -1,0 +1,121 @@
+name: ursula
+
+# Ursula event streams, with a disk-backed WAL.
+#
+#   docker compose up -d                    single durable node (default)
+#   docker compose --profile raft up -d     three-voter cluster
+#
+# The default profile starts exactly one service. Everything for the cluster is
+# behind the `raft` profile, so a plain `up` cannot accidentally start voters
+# that have nowhere to reach quorum.
+#
+# Replaces the ephemeral stack in
+# /Users/mt0/src/mt0/rust/axum-ursula-event-streaming, which publishes 4437 with
+# no volume — so every restart drops every bucket. That is what wiped `builds`
+# on 2026-08-24 and made completed builds look as though log streaming had
+# broken.
+
+x-ursula: &ursula
+  image: ghcr.io/tonbo-io/ursula:${URSULA_VERSION:-0.3.0}
+  restart: unless-stopped
+  environment:
+    - RUSTLOG=${RUSTLOG:-log}
+
+volumes:
+  ursula-data:
+  ursula-2-data:
+  ursula-3-data:
+
+networks:
+  ursula:
+    name: ursula
+    driver: bridge
+
+services:
+  # ── Default: one durable node ──────────────────────────────────────────────
+  #
+  # Published on 4437 so this is a drop-in replacement for the current stack.
+  # See the plan doc before exposing it beyond localhost: Ursula has no auth of
+  # its own, so anything that can reach this port can read and write every
+  # stream.
+  ursula:
+    <<: *ursula
+    container_name: ursula
+    command:
+      - --config
+      - /etc/ursula/ursula.toml
+      - --node-id
+      - "1"
+    ports:
+      - "${URSULA_PORT:-4437}:4437"
+    networks:
+      - ursula
+    volumes:
+      # URSULA_CONFIG selects the node's config without a second service
+      # definition: the cluster needs peers listed, the single node must not
+      # have them.
+      - ${URSULA_CONFIG:-./ursula/single.toml}:/etc/ursula/ursula.toml:ro
+      - ursula-data:/var/lib/ursula
+    # FIXME: no healthcheck. The image ships `sh` and nothing else — no wget,
+    # curl or nc — so any HTTP probe fails on a missing binary and the container
+    # reports "unhealthy" while serving normally. Probe from outside, or add a
+    # sidecar with a client, before relying on `condition: service_healthy`.
+
+  # ── gateway profile: KrakenD in front ──────────────────────────────────────
+  #
+  # Ursula has no auth of its own, so anything reaching 4437 reads every
+  # tenant's logs. KrakenD validates a Locci access token against the issuer's
+  # JWKS before proxying. Opt-in: `docker compose --profile gateway up -d`.
+  #
+  # Once callers use 4438, stop publishing 4437.
+  krakend:
+    image: devopsfaith/krakend:2.7
+    container_name: ursula-gateway
+    profiles: [gateway]
+    restart: unless-stopped
+    depends_on: [ursula]
+    networks:
+      - ursula
+    ports:
+      - "${URSULA_GATEWAY_PORT:-4438}:8080"
+    volumes:
+      - ./krakend/krakend.json:/etc/krakend/krakend.json:ro
+    command: ["run", "-c", "/etc/krakend/krakend.json"]
+
+  # ── raft profile: two more voters ──────────────────────────────────────────
+  #
+  # Three voters tolerate one failure. Two would tolerate none and still need
+  # both alive for quorum, which is strictly worse than a single node.
+  #
+  # Start these together with URSULA_CONFIG=./ursula/cluster.toml, and read the
+  # cluster notes in that file first — the first boot needs
+  # init_membership_per_group and a shared cold tier.
+  ursula-2:
+    <<: *ursula
+    container_name: ursula-2
+    profiles: [raft]
+    command:
+      - --config
+      - /etc/ursula/ursula.toml
+      - --node-id
+      - "2"
+    networks:
+      - ursula
+    volumes:
+      - ./ursula/cluster.toml:/etc/ursula/ursula.toml:ro
+      - ursula-2-data:/var/lib/ursula
+
+  ursula-3:
+    <<: *ursula
+    container_name: ursula-3
+    profiles: [raft]
+    command:
+      - --config
+      - /etc/ursula/ursula.toml
+      - --node-id
+      - "3"
+    networks:
+      - ursula
+    volumes:
+      - ./ursula/cluster.toml:/etc/ursula/ursula.toml:ro
+      - ursula-3-data:/var/lib/ursula
