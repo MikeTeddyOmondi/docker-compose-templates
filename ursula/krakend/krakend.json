@@ -29,6 +29,28 @@
     },
     {
       "endpoint": "/{bucket}/{stream}",
+      "method": "PUT",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "host": [
+            "http://ursula:4437"
+          ],
+          "url_pattern": "/{bucket}/{stream}",
+          "encoding": "no-op"
+        }
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "ES256",
+          "jwk_url": "http://host.docker.internal:8787/.well-known/jwks.json",
+          "cache": true,
+          "disable_jwk_security": true
+        }
+      }
+    },
+    {
+      "endpoint": "/{bucket}/{stream}",
       "method": "POST",
       "output_encoding": "no-op",
       "backend": [

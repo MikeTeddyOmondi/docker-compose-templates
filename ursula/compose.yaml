@@ -46,8 +46,11 @@ services:
       - /etc/ursula/ursula.toml
       - --node-id
       - "1"
-    ports:
-      - "${URSULA_PORT:-4437}:4437"
+    # Deliberately unpublished. Ursula has no auth of its own, so the only way
+    # in is the gateway. Add a port here and every tenant's logs are public
+    # again. Reachable in-network as `ursula:4437`.
+    expose:
+      - "4437"
     networks:
       - ursula
     volumes:
@@ -77,7 +80,7 @@ services:
     networks:
       - ursula
     ports:
-      - "${URSULA_GATEWAY_PORT:-4438}:8080"
+      - "${URSULA_GATEWAY_PORT:-4437}:8080"
     volumes:
       - ./krakend/krakend.json:/etc/krakend/krakend.json:ro
     command: ["run", "-c", "/etc/krakend/krakend.json"]
