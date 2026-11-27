@@ -1,0 +1,37 @@
+# Single durable node.
+#
+# The one line that matters is `backend = "disk"`. With the default in-memory
+# WAL a restart drops every bucket and stream, which is exactly how the
+# `builds` bucket disappeared on 2026-08-24 and made finished builds look as
+# though log streaming had failed.
+
+[server]
+# Binds all interfaces inside the container. What makes it reachable is the
+# `ports:` mapping in compose.yaml, not this.
+listen = "0.0.0.0:4437"
+
+[raft]
+node_id = 1
+# 16 is fine for build logs. The standard preset is 256; raise it for real
+# load, not for a laptop.
+group_count = 16
+
+[raft.wal]
+backend = "disk"
+path = "/var/lib/ursula"
+
+# ── Cold tier ────────────────────────────────────────────────────────────────
+# Optional for one node, and worth it only for retention past the hot ring.
+# Required for a cluster, where every replica reads chunks flushed by whichever
+# node was leader.
+#
+# [storage.cold]
+# backend = "s3"
+# root = "ursula-locci-20260824"   # date-stamped so cleanup cannot touch other data
+# [storage.cold.s3]
+# bucket = "ursula-locci"
+# region = "auto"                  # R2 uses "auto"
+# endpoint = "https://<accountid>.r2.cloudflarestorage.com"
+# # Prefer the SDK credential chain over keys in this file.
+# # MinIO without KMS rejects SSE headers — set this or writes fail:
+# # server_side_encryption = "none"

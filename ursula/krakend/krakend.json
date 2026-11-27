@@ -1,0 +1,196 @@
+{
+  "$schema": "https://www.krakend.io/schema/v2.7/krakend.json",
+  "version": 3,
+  "name": "ursula-gateway",
+  "port": 8080,
+  "timeout": "0s",
+  "extra_config": {
+    "router": {
+      "return_error_msg": true,
+      "auto_options": true
+    }
+  },
+  "endpoints": [
+    {
+      "endpoint": "/{bucket}",
+      "method": "PUT",
+      "output_encoding": "no-op",
+      "input_headers": [
+        "Authorization",
+        "Content-Type",
+        "Accept"
+      ],
+      "backend": [
+        {
+          "host": [
+            "http://ursula:4437"
+          ],
+          "url_pattern": "/{bucket}",
+          "encoding": "no-op",
+          "extra_config": {
+            "backend/http": {
+              "return_error_code": true
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "ES256",
+          "jwk_url": "http://host.docker.internal:8787/.well-known/jwks.json",
+          "issuer": "http://localhost:8787",
+          "cache": true,
+          "cache_duration": 900,
+          "disable_jwk_security": true,
+          "propagate_claims": [
+            [
+              "properties.id",
+              "x-locci-tenant"
+            ],
+            [
+              "properties.email",
+              "x-locci-email"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "endpoint": "/{bucket}/{stream}",
+      "method": "PUT",
+      "output_encoding": "no-op",
+      "input_headers": [
+        "Authorization",
+        "Content-Type",
+        "Accept"
+      ],
+      "backend": [
+        {
+          "host": [
+            "http://ursula:4437"
+          ],
+          "url_pattern": "/{bucket}/{stream}",
+          "encoding": "no-op",
+          "extra_config": {
+            "backend/http": {
+              "return_error_code": true
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "ES256",
+          "jwk_url": "http://host.docker.internal:8787/.well-known/jwks.json",
+          "issuer": "http://localhost:8787",
+          "cache": true,
+          "cache_duration": 900,
+          "disable_jwk_security": true,
+          "propagate_claims": [
+            [
+              "properties.id",
+              "x-locci-tenant"
+            ],
+            [
+              "properties.email",
+              "x-locci-email"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "endpoint": "/{bucket}/{stream}",
+      "method": "POST",
+      "output_encoding": "no-op",
+      "input_headers": [
+        "Authorization",
+        "Content-Type",
+        "Accept"
+      ],
+      "backend": [
+        {
+          "host": [
+            "http://ursula:4437"
+          ],
+          "url_pattern": "/{bucket}/{stream}",
+          "encoding": "no-op",
+          "extra_config": {
+            "backend/http": {
+              "return_error_code": true
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "ES256",
+          "jwk_url": "http://host.docker.internal:8787/.well-known/jwks.json",
+          "issuer": "http://localhost:8787",
+          "cache": true,
+          "cache_duration": 900,
+          "disable_jwk_security": true,
+          "propagate_claims": [
+            [
+              "properties.id",
+              "x-locci-tenant"
+            ],
+            [
+              "properties.email",
+              "x-locci-email"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "endpoint": "/{bucket}/{stream}",
+      "method": "GET",
+      "timeout": "1h",
+      "output_encoding": "no-op",
+      "input_headers": [
+        "Authorization",
+        "Content-Type",
+        "Accept"
+      ],
+      "backend": [
+        {
+          "host": [
+            "http://ursula:4437"
+          ],
+          "url_pattern": "/{bucket}/{stream}",
+          "encoding": "no-op",
+          "extra_config": {
+            "backend/http": {
+              "return_error_code": true
+            }
+          }
+        }
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "ES256",
+          "jwk_url": "http://host.docker.internal:8787/.well-known/jwks.json",
+          "issuer": "http://localhost:8787",
+          "cache": true,
+          "cache_duration": 900,
+          "disable_jwk_security": true,
+          "propagate_claims": [
+            [
+              "properties.id",
+              "x-locci-tenant"
+            ],
+            [
+              "properties.email",
+              "x-locci-email"
+            ]
+          ]
+        }
+      },
+      "input_query_strings": [
+        "offset",
+        "live"
+      ]
+    }
+  ]
+}
