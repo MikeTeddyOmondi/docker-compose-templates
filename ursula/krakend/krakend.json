@@ -146,6 +146,7 @@
     {
       "endpoint": "/{bucket}/{stream}",
       "method": "GET",
+      "timeout": "1h",
       "output_encoding": "no-op",
       "input_headers": [
         "Authorization",
